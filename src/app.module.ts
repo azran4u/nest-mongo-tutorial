@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CatsModule } from './cats/cats.module';
+import { AppMongoService } from './app.mongo.service';
 
 @Module({
   imports: [
@@ -9,5 +10,7 @@ import { CatsModule } from './cats/cats.module';
     }),
     CatsModule,
   ],
+  providers: [AppMongoService],
+  exports: [AppMongoService],
 })
 export class AppModule {}

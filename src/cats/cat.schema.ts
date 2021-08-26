@@ -5,10 +5,10 @@ export type CatDocument = Cat & Document;
 
 @Schema()
 export class Cat {
-  @Prop()
+  @Prop({ unique: true, required: true })
   name: string;
 
-  @Prop()
+  @Prop({ min: 0 })
   age: number;
 
   @Prop()
