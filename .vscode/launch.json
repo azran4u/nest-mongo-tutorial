@@ -16,25 +16,12 @@
       "internalConsoleOptions": "openOnFirstSessionStart"
     },
     {
-      "name": "jest",
-      "type": "node",
-      "request": "launch",
-      "program": "jest",
-      "preLaunchTask": "build",
-      "args": [],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
-    },
-    {
       "type": "node",
       "request": "launch",
       "name": "Debug Tests",
       "program": "${workspaceRoot}/node_modules/.bin/jest",
       "cwd": "${workspaceRoot}",
-      "args": ["--i", "--config", "jest.config.js"],
-      "windows": {
-        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
-      }
+      "args": ["--i", "--config", "jest.config.js"]
     }
   ]
 }
