@@ -1,13 +1,14 @@
+import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { AppMongoService } from './app.mongo.service';
-import { Configuration } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.get(AppMongoService);
-  const port = app.get<Configuration>('CONFIG').port;
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('port');
   await app.listen(port);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  const logger = app.get<Logger>(Logger);
+  logger.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

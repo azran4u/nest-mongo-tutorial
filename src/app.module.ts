@@ -1,29 +1,37 @@
-import { Module } from '@nestjs/common';
+import { Inject, Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { WinstonModule } from 'nest-winston';
 import { CatsModule } from './cats/cats.module';
-import { AppMongoService } from './app.mongo.service';
-import config, { Configuration } from './config';
+import { Configuration, getConfig } from './config';
+import { loggerOptionsFactory } from './logger';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/test', {
-      useNewUrlParser: true,
-      useCreateIndex: true,
+    ConfigModule.forRoot({
+      ignoreEnvFile: true,
+      isGlobal: true,
+      load: [getConfig],
     }),
+    WinstonModule.forRootAsync({
+      useFactory: (configService: ConfigService) => {
+        return loggerOptionsFactory(configService);
+      },
+      inject: [ConfigService],
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('database.url'),
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+        useFindAndModify: false,
+      }),
+    }),
+
     CatsModule,
   ],
-  providers: [
-    AppMongoService,
-    {
-      provide: 'CONFIG',
-      useFactory: (): Configuration => {
-        const envConfig = config()[process.env.NODE_ENV ?? 'dev'];
-        if (!envConfig)
-          throw new Error(`no config for ${process.env.NODE_ENV}`);
-        return envConfig;
-      },
-    },
-  ],
-  exports: [AppMongoService],
 })
 export class AppModule {}

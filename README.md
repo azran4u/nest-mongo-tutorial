@@ -25,3 +25,6 @@ Then, run Nest as usual:
 
 `npm run start`
 
+### Code samples
+Apps - https://github.com/nestjs/nest/tree/master/sample
+Testing - https://github.com/jmcdo29/testing-nestjs/tree/master/apps

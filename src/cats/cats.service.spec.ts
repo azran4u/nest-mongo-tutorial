@@ -3,7 +3,7 @@ import { CatsService } from './cats.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { CatDocument, Cat } from './cat.schema';
 import { createMock } from '@golevelup/nestjs-testing';
-import { Model, Query } from 'mongoose';
+import { Model, Query, QueryWithHelpers } from 'mongoose';
 import { ICat } from './cat.interface';
 
 const lasagna = 'lasagna lover';
@@ -102,26 +102,15 @@ describe('CatService', () => {
     });
     expect(newCat).toEqual(mockCat('Oliver', 'some id', 1, 'Tabby'));
   });
-  // // jest is complaining about findOneAndUpdate. Can't say why at the moment.
-  // it.skip('should update a cat successfully', async () => {
-  //   jest.spyOn(model, 'findOneAndUpdate').mockReturnValueOnce(
-  //     createMock<Query<CatDoc, CatDoc>>({
-  //       exec: jest.fn().mockResolvedValueOnce({
-  //         _id: lasagna,
-  //         name: 'Garfield',
-  //         breed: 'Tabby',
-  //         age: 42,
-  //       }),
-  //     }),
-  //   );
-  //   const updatedCat = await service.updateOne({
-  //     _id: lasagna,
-  //     name: 'Garfield',
-  //     breed: 'Tabby',
-  //     age: 42,
-  //   });
-  //   expect(updatedCat).toEqual(mockCat('Garfield', lasagna, 42, 'Tabby'));
-  // });
+  // jest is complaining about findOneAndUpdate. Can't say why at the moment.
+  it('should update a cat successfully', async () => {
+    const cat = { id: lasagna, name: 'Garfield', breed: 'Tabby', age: 42 };
+    jest
+      .spyOn(model, 'findOneAndUpdate')
+      .mockResolvedValue(mockCatDoc(cat) as any);
+    const updatedCat = await service.update(cat);
+    expect(updatedCat).toEqual(mockCat('Garfield', lasagna, 42, 'Tabby'));
+  });
   // it('should delete a cat successfully', async () => {
   //   // really just returning a truthy value here as we aren't doing any logic with the return
   //   jest.spyOn(model, 'remove').mockResolvedValueOnce(true as any);
