@@ -8,7 +8,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export class CreateCatInput {
-    name?: Nullable<string>;
+    name: string;
     age?: Nullable<number>;
     breed?: Nullable<string>;
 }
@@ -28,8 +28,8 @@ export abstract class ISubscription {
 }
 
 export class Cat {
-    id?: Nullable<number>;
-    name?: Nullable<string>;
+    id: string;
+    name: string;
     age?: Nullable<number>;
     breed?: Nullable<string>;
 }

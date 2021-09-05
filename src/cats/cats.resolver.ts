@@ -1,7 +1,6 @@
-import { ParseIntPipe } from "@nestjs/common";
 import { Args, Mutation, Query, Resolver, Subscription } from "@nestjs/graphql";
 import { PubSub } from "graphql-subscriptions";
-import { Cat } from "../graphql.schema";
+import { ICat } from "./cat.interface";
 import { CatsService } from "./cats.service";
 import { CreateCatDto } from "./create-cat.dto";
 
@@ -12,20 +11,20 @@ export class CatsResolver {
   constructor(private readonly catsService: CatsService) {}
 
   @Query("cats")
-  async getCats() {
+  async getCats(): Promise<ICat[]> {
     return this.catsService.findAll();
   }
 
   @Query("cat")
   async findOneById(
-    @Args("id", ParseIntPipe)
-    id: number
-  ): Promise<Cat> {
+    @Args("id")
+    id: string
+  ): Promise<ICat> {
     return this.catsService.findOneById(id);
   }
 
   @Mutation("createCat")
-  async create(@Args("createCatInput") args: CreateCatDto): Promise<Cat> {
+  async create(@Args("createCatInput") args: CreateCatDto): Promise<ICat> {
     const createdCat = await this.catsService.create(args);
     pubSub.publish("catCreated", { catCreated: createdCat });
     return createdCat;
