@@ -7,6 +7,7 @@ import { ICat } from "./cat.interface";
 import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import { Logger } from "winston";
 import { childLogger } from "../logger";
+import { docToInterface } from "src/utils/mongo.doc-to-interface";
 
 @Injectable()
 export class CatsService {
@@ -19,10 +20,8 @@ export class CatsService {
 
   async create(createCatDto: CreateCatDto): Promise<ICat> {
     const createdCat = await this.catModel.create(createCatDto);
-    const id = createdCat._id;
-    delete createdCat["_id"];
     this.logger.info(`created a new cat`);
-    return { ...createdCat, id };
+    return createdCat.toInterface();
   }
 
   async update(updateCat: ICat): Promise<ICat> {

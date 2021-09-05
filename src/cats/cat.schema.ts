@@ -1,7 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
+import { ICat } from "./cat.interface";
 
-export type CatDocument = Cat & Document;
+export type CatDocument = Omit<Cat, "id"> &
+  Document & { toInterface(): Promise<ICat> };
 
 @Schema()
 export class Cat {
@@ -15,4 +17,12 @@ export class Cat {
   breed: string;
 }
 
-export const CatSchema = SchemaFactory.createForClass(Cat);
+export const CatSchema = SchemaFactory.createForClass<Cat, CatDocument>(
+  Cat
+).method("toInterface", function () {
+  var obj = this.toObject();
+  obj.id = obj._id;
+  delete obj._id;
+  delete obj.__v;
+  return obj;
+});
