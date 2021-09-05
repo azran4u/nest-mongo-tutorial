@@ -1,46 +1,23 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
-import { CreateCatDto } from "./create-cat.dto";
-import { Cat, CatDocument } from "./cat.schema";
-import { ICat } from "./cat.interface";
-import { WINSTON_MODULE_PROVIDER } from "nest-winston";
-import { Logger } from "winston";
-import { childLogger } from "../logger";
-import { docToInterface } from "src/utils/mongo.doc-to-interface";
+import { Injectable } from "@nestjs/common";
+import { Cat } from "../graphql.schema";
 
 @Injectable()
 export class CatsService {
-  constructor(
-    @InjectModel(Cat.name) private readonly catModel: Model<CatDocument>,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
-  ) {
-    this.logger = childLogger(logger, { service: "CatService" });
+  private readonly cats: Array<Cat & { ownerId?: number }> = [
+    { id: 1, name: "Cat", age: 5, ownerId: 1 },
+  ];
+
+  create(cat: Cat): Cat {
+    cat.id = this.cats.length + 1;
+    this.cats.push(cat);
+    return cat;
   }
 
-  async create(createCatDto: CreateCatDto): Promise<ICat> {
-    const createdCat = await this.catModel.create(createCatDto);
-    this.logger.info(`created a new cat`);
-    return createdCat.toInterface();
+  findAll(): Cat[] {
+    return this.cats;
   }
 
-  async update(updateCat: ICat): Promise<ICat> {
-    const cat = await this.catModel.findByIdAndUpdate(
-      { _id: updateCat.id },
-      updateCat,
-      { new: true, upsert: true }
-    );
-    const id = cat._id;
-    delete cat["_id"];
-    return { ...cat, id };
-  }
-
-  async findAll(): Promise<ICat[]> {
-    const cats = await this.catModel.find().exec();
-    return cats.map((cat) => {
-      const id = cat._id;
-      delete cat["_id"];
-      return { ...cat, id };
-    });
+  findOneById(id: number): Cat {
+    return this.cats.find((cat) => cat.id === id);
   }
 }

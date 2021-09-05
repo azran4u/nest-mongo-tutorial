@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { GraphQLModule } from "@nestjs/graphql";
 import { MongooseModule } from "@nestjs/mongoose";
 import { WinstonModule } from "nest-winston";
 import { CatsModule } from "./cats/cats.module";
@@ -23,6 +24,12 @@ import { loggerOptionsFactory } from "./logger";
         useFindAndModify: false,
       }),
       inject: [AppConfigService],
+    }),
+    GraphQLModule.forRoot({
+      debug: false,
+      playground: true,
+      typePaths: ["./**/*.graphql"],
+      installSubscriptionHandlers: true,
     }),
     CatsModule,
   ],
