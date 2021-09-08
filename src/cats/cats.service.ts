@@ -14,8 +14,9 @@ import { Cat } from "../graphql.schema";
 import { CatDocument } from "./cat.schema";
 import { CreateCatDto } from "./create-cat.dto";
 import { ICat } from "./cat.interface";
-import * as _ from "lodash";
+import { isNil, isString } from "lodash";
 import * as Joi from "joi";
+
 @Injectable()
 export class CatsService {
   constructor(
@@ -39,7 +40,8 @@ export class CatsService {
     try {
       createdCat = await this.catModel.create(cat);
     } catch (error) {
-      throw new InternalServerErrorException(error, "Database error");
+      this.logger.error(`cannot create a new cat, database failure ${error}`);
+      throw new InternalServerErrorException();
     }
     return createdCat.toInterface();
   }
@@ -49,20 +51,28 @@ export class CatsService {
     try {
       cats = await this.catModel.find().exec();
     } catch (error) {
-      throw new InternalServerErrorException(error, "Database error");
+      this.logger.error(`cannot find all cats, database failure ${error}`);
+      throw new InternalServerErrorException();
     }
-    if (_.isNil(cats)) cats = [];
+    if (isNil(cats)) cats = [];
     return cats.map((cat) => cat.toInterface());
   }
 
   async findOneById(id: string): Promise<ICat> {
     let cat: CatDocument;
+    if (!isString(id)) {
+      this.logger.error(`findOneById recieved an invalid id ${id}`);
+      throw new BadRequestException(`invalid id ${id}`);
+    }
     try {
       cat = await this.catModel.findOne({ id }).exec();
     } catch (error) {
-      throw new InternalServerErrorException(error, "Database error");
+      this.logger.error(
+        `cannot find a cat with id ${id}, database failure ${error}`
+      );
+      throw new InternalServerErrorException();
     }
-    if (_.isNil(cat))
+    if (isNil(cat))
       throw new NotFoundException(
         undefined,
         `cat with id ${id} doesn't exists`
