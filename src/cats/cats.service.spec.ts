@@ -78,7 +78,7 @@ describe("CatService", () => {
     jest.clearAllMocks();
   });
 
-  it("should return all cats", async () => {
+  it("findAll should return all cats", async () => {
     jest.spyOn(model, "find").mockReturnValue({
       exec: jest.fn().mockResolvedValueOnce(mockCatDocuments),
     } as any);
