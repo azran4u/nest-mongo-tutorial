@@ -4,8 +4,9 @@
   "description": "Nest TypeScript starter repository",
   "license": "MIT",
   "scripts": {
+    "generate-typings": "ts-node src/generate-typings",
     "prebuild": "rimraf dist",
-    "build": "ts-node src/generate-typings && nest build",
+    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

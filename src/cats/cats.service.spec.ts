@@ -6,6 +6,11 @@ import { createMock } from "@golevelup/nestjs-testing";
 import { Model, Query } from "mongoose";
 import { Cat, CatDocument } from "./cat.schema";
 import { WINSTON_MODULE_PROVIDER } from "nest-winston";
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from "@nestjs/common";
+import { rejects } from "assert";
 
 const mockICats: ICat[] = [
   {
@@ -56,7 +61,7 @@ describe("CatService", () => {
           useValue: {
             new: jest.fn(),
             constructor: jest.fn(),
-            child: jest.fn().mockResolvedValue({
+            child: jest.fn().mockReturnValue({
               defaultMeta: {},
               error: jest.fn(),
             }),
@@ -84,5 +89,43 @@ describe("CatService", () => {
     } as any);
     const cats = await service.findAll();
     expect(cats).toEqual(mockICats);
+  });
+  it("findAll should throw when database error", async () => {
+    jest.spyOn(model, "find").mockReturnValue({
+      exec: jest.fn().mockRejectedValueOnce(new Error()),
+    } as any);
+    await expect(async () => {
+      await service.findAll();
+    }).rejects.toThrowError(InternalServerErrorException);
+  });
+  it("findAll should return empty array if database returned null", async () => {
+    jest.spyOn(model, "find").mockReturnValue({
+      exec: jest.fn().mockResolvedValueOnce(null),
+    } as any);
+    const cats = await service.findAll();
+    expect(cats).toEqual([]);
+  });
+  it("findById should return a cat", async () => {
+    jest.spyOn(model, "findOne").mockReturnValue({
+      exec: jest.fn().mockResolvedValueOnce(mockCatDocuments[0]),
+    } as any);
+    const cats = await service.findOneById("id1");
+    expect(cats).toEqual(mockICats[0]);
+  });
+  it("findById should throw the id doesn't exists", async () => {
+    jest.spyOn(model, "findOne").mockReturnValue({
+      exec: jest.fn().mockResolvedValueOnce(null),
+    } as any);
+    await expect(async () => {
+      await service.findOneById("id1");
+    }).rejects.toThrowError(NotFoundException);
+  });
+  it("findById should throw when database error", async () => {
+    jest.spyOn(model, "findOne").mockReturnValue({
+      exec: jest.fn().mockRejectedValueOnce(new Error()),
+    } as any);
+    await expect(async () => {
+      await service.findOneById("id1");
+    }).rejects.toThrowError(InternalServerErrorException);
   });
 });
