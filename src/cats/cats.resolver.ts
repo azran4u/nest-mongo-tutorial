@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver, Subscription } from "@nestjs/graphql";
 import { PubSub } from "graphql-subscriptions";
-import { createJoiValidationPipe } from "src/utils/joi.validation.pipe";
+import { JoiValidationPipe } from "src/utils/joi.validation.pipe";
 import { ICat } from "./cat.interface";
 import { CatsService } from "./cats.service";
 import { CreateCatDto } from "./create-cat.dto";
@@ -38,7 +38,7 @@ export class CatsResolver {
   async create(
     @Args(
       "createCatInput",
-      createJoiValidationPipe(
+      JoiValidationPipe(
         Joi.object({
           name: Joi.string().min(3).max(30).required(),
           age: Joi.number().integer().min(5).max(35),

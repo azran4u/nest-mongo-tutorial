@@ -9,7 +9,7 @@ import {
   forwardRef,
 } from "@nestjs/common";
 import { ObjectSchema } from "joi";
-import { memoize } from "lodash";
+import { memoize, MemoizedFunction } from "lodash";
 import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import { Logger } from "winston";
 
@@ -26,8 +26,10 @@ import { Logger } from "winston";
 //   }
 // }
 
-// export const JoiValidationPipe: (schema: ObjectSchema) => PipeTransform =
-//   memoize(createJoiValidationPipe);
+export const JoiValidationPipe: ((
+  schema: ObjectSchema
+) => Type<PipeTransform>) &
+  MemoizedFunction = memoize(createJoiValidationPipe);
 
 export function createJoiValidationPipe(
   schema: ObjectSchema
