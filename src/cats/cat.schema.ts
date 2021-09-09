@@ -19,4 +19,6 @@ export class Cat {
 
 export const CatSchema = SchemaFactory.createForClass<Cat, CatDocument>(
   Cat
-).method("toInterface", () => docToInterface(this));
+).method("toInterface", function () {
+  return docToInterface(this);
+});
