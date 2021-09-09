@@ -125,6 +125,12 @@ describe("CatService", () => {
         await service.findOneById("id1");
       }).rejects.toThrowError(NotFoundException);
     });
+    it("findById should throw if the id is not a string", async () => {
+      await expect(async () => {
+        //@ts-ignore
+        await service.findOneById(1);
+      }).rejects.toThrowError(BadRequestException);
+    });
     it("findById should throw when database error", async () => {
       jest.spyOn(model, "findOne").mockReturnValue({
         exec: jest.fn().mockRejectedValueOnce(new Error()),
