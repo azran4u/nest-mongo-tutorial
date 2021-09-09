@@ -39,11 +39,11 @@ export class CatsService {
     let createdCat: CatDocument;
     try {
       createdCat = await this.catModel.create(cat);
+      return createdCat.toInterface();
     } catch (error) {
       this.logger.error(`cannot create a new cat, database failure ${error}`);
       throw new InternalServerErrorException();
     }
-    return createdCat.toInterface();
   }
 
   async findAll(): Promise<ICat[]> {
